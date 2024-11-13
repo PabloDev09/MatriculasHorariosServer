@@ -6,7 +6,7 @@ import org.springframework.stereotype.Repository;
 import es.iesjandula.matriculas_horarios_server.models.DatosBrutoAlumnoMatriculaEntity;
 
 @Repository
-public interface IDatosBrutoAlumnoMatricula extends JpaRepository<DatosBrutoAlumnoMatriculaEntity, Integer>
+public interface IDatosBrutoAlumnoMatriculaRepository extends JpaRepository<DatosBrutoAlumnoMatriculaEntity, Integer>
 {
 	
 }

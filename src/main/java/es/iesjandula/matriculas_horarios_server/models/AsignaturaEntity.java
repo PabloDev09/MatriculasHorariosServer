@@ -3,7 +3,6 @@ package es.iesjandula.matriculas_horarios_server.models;
 import java.util.List;
 
 import es.iesjandula.matriculas_horarios_server.models.ids.IdAsignatura;
-import es.iesjandula.matriculas_horarios_server.models.ids.IdMatricula;
 import jakarta.persistence.EmbeddedId;
 import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
