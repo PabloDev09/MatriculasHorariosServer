@@ -1,7 +1,16 @@
 package es.iesjandula.matriculas_horarios_server.rest;
 
+<<<<<<< HEAD
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+=======
+import java.util.ArrayList;
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.ModelAttribute;
+>>>>>>> d916e2b (Commit endpoint CursoEtapa)
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -37,9 +46,27 @@ public class BaseController
 	}
 	
 	@RequestMapping(method = RequestMethod.GET, value = "/base/cargarCursoEtapa")
+<<<<<<< HEAD
 	public ResponseEntity<?> cargarCursoEtapa
 	()throws MatriculasHorariosServerException
 	{
 		return ResponseEntity.status(200).body(null);
+=======
+	public ResponseEntity<?> cargarCursoEtapa (@ModelAttribute CursoEtapaEntity CursoEtapaEntity)
+	throws MatriculasHorariosServerException
+	{
+		try {
+			List<CursoEtapaEntity>ListaCursoEtapa= new ArrayList<>();
+			
+			ListaCursoEtapa = iCursoEtapaRepository.findAll();
+			
+			return ResponseEntity.ok(ListaCursoEtapa);
+		}catch(Exception exception) {
+			MatriculasHorariosServerException CursoEtapaException= new MatriculasHorariosServerException(1,"Error al cargar la lista ", exception);
+			log.error("Error al cargar la lista", CursoEtapaException);
+			return ResponseEntity.status(500).body(CursoEtapaException.getBodyExceptionMessage());
+		}
+		
+>>>>>>> d916e2b (Commit endpoint CursoEtapa)
 	}
 }
