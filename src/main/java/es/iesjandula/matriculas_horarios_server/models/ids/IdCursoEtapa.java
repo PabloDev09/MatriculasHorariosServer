@@ -24,4 +24,7 @@ public class IdCursoEtapa implements Serializable
 	
 	@Column(length = 50)
 	private String etapa;
+	
+	@Column(length = 1)
+	private String grupo;
 }
