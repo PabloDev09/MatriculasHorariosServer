@@ -18,6 +18,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import es.iesjandula.matriculas_horarios_server.models.CursoEtapaEntity;
 import es.iesjandula.matriculas_horarios_server.repositories.ICursoEtapaRepository;
+import es.iesjandula.matriculas_horarios_server.services.IParseoDatosBrutos;
 import es.iesjandula.matriculas_horarios_server.utils.MatriculasHorariosServerException;
 import lombok.extern.slf4j.Slf4j;
 
@@ -29,6 +30,8 @@ public class BaseController
 	@Autowired
 	ICursoEtapaRepository iCursoEtapaRepository;
 	
+	@Autowired
+	IParseoDatosBrutos iParseoDatosBrutos;
 	
 	
 	@RequestMapping(method = RequestMethod.POST, value = "/cargarDatosBrutos")
