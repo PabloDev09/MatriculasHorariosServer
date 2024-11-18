@@ -4,18 +4,21 @@ import java.io.File;
 import java.util.Scanner;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.transaction.annotation.Transactional;
 
+import es.iesjandula.matriculas_horarios_server.models.ids.IdCursoEtapa;
 import es.iesjandula.matriculas_horarios_server.services.IParseoCursoEtapa;
 import es.iesjandula.matriculas_horarios_server.utils.Constants;
 
 @SpringBootApplication
-public class MatriculasHorariosServerApplication 
+public class MatriculasHorariosServerApplication implements CommandLineRunner
 {
 	@Autowired
 	IParseoCursoEtapa iParseoCursoEtapa;
+
 	
 	public static void main(String[] args) 
 	{
