@@ -9,4 +9,7 @@ public class Constants
 	
 	// Ruta de acceso hacia src/main/resources/
 	public static final String CSV_ROUTES = "src" + File.separator + "main" + File.separator + "resources" + File.separator;
+
+	// Letra del grupo
+	public static final char GROUP = 'A';
 }

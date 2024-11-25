@@ -13,12 +13,15 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import es.iesjandula.matriculas_horarios_server.models.CursoEtapaEntity;
+import es.iesjandula.matriculas_horarios_server.models.ids.IdCursoEtapa;
 import es.iesjandula.matriculas_horarios_server.repositories.ICursoEtapaRepository;
 import es.iesjandula.matriculas_horarios_server.services.IParseoDatosBrutos;
+import es.iesjandula.matriculas_horarios_server.utils.Constants;
 import es.iesjandula.matriculas_horarios_server.utils.MatriculasHorariosServerException;
 import lombok.extern.slf4j.Slf4j;
 
@@ -39,7 +42,7 @@ public class BaseController
 	(
 			@RequestHeader CursoEtapaEntity cursoEtapaEntity,
 			@RequestHeader MultipartFile file
-	)throws MatriculasHorariosServerException, IOException
+	)
 	{
 		try 
 		{
@@ -73,14 +76,16 @@ public class BaseController
 			
 			// Devolver codigo, mensaje y traza de error
 			return ResponseEntity.status(400).body(e.getBodyExceptionMessage());
+		} catch (IOException e) {
+			String msgError = "ERROR - El fichero no se ha podido leer";
+			log.error(msgError);
+			return ResponseEntity.status(500).body(msgError);
 		}
 	}
 		
 
 	@RequestMapping(method = RequestMethod.GET, value = "/obtenerCursoEtapa")
 	public ResponseEntity<?> cargarCursoEtapa()
-	
-	throws MatriculasHorariosServerException
 	{
 		try 
 		{
@@ -110,6 +115,44 @@ public class BaseController
 			// Devolver codigo, mensaje y traza de error
 			return ResponseEntity.status(404).body(e.getBodyExceptionMessage());
 		}
+		
+
+	}
+	
+	@RequestMapping(method = RequestMethod.POST, value = "/grupos")
+	public ResponseEntity<?> crearGrupo(@RequestParam CursoEtapaEntity cursoEtapaEntity)
+	{
+		// Curso donde crear el grupo
+		int curso = cursoEtapaEntity.getIdCursoEtapa().getCurso();
+		
+		// Etapa donde crear el grupo
+		String etapa = cursoEtapaEntity.getIdCursoEtapa().getEtapa();
+		
+		// Numero de veces repetido el Curso Etapa en la BD
+		int contador = this.iCursoEtapaRepository.findCountByCursoAndEtapa(curso, etapa);
+		
+		// Asignar la letra A
+		char grupo = Constants.GROUP;
+		
+		// Asignar la letra según el numero de veces que este repetido en BD
+		for(int i = 0; i < contador; i++)
+		{
+			grupo++;
+		}
+		
+		// Crear registro de Curso Etapa
+		CursoEtapaEntity cursoEtapa = new CursoEtapaEntity();
+		
+		// Crear campo de id con todos los campos
+		IdCursoEtapa idCursoEtapa = new IdCursoEtapa(curso, etapa, grupo);
+		
+		// Asignar el id al registro de Curso Etapa
+		cursoEtapa.setIdCursoEtapa(idCursoEtapa);
+		
+		// Insertar en BD
+		this.iCursoEtapaRepository.saveAndFlush(cursoEtapa);
+		// Devolver la lista
+		return ResponseEntity.status(200).body("INFO - Grupo creado correctamente");
 		
 
 	}
