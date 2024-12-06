@@ -18,7 +18,9 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import es.iesjandula.matriculas_horarios_server.models.CursoEtapaEntity;
-import es.iesjandula.matriculas_horarios_server.models.ids.IdCursoEtapa;
+import es.iesjandula.matriculas_horarios_server.models.CursoEtapaGrupoEntity;
+import es.iesjandula.matriculas_horarios_server.models.ids.IdCursoEtapaGrupo;
+import es.iesjandula.matriculas_horarios_server.repositories.ICursoEtapaGrupoRepository;
 import es.iesjandula.matriculas_horarios_server.repositories.ICursoEtapaRepository;
 import es.iesjandula.matriculas_horarios_server.services.IParseoDatosBrutos;
 import es.iesjandula.matriculas_horarios_server.utils.Constants;
@@ -32,6 +34,9 @@ public class BaseController
 {	
 	@Autowired
 	ICursoEtapaRepository iCursoEtapaRepository;
+	
+	@Autowired
+	ICursoEtapaGrupoRepository iCursoEtapaGrupoRepository;
 	
 	@Autowired
 	IParseoDatosBrutos iParseoDatosBrutos;
@@ -54,8 +59,7 @@ public class BaseController
 			
 	        // Convertir MultipartFile a Readable 
 	        ByteArrayInputStream fileReadable = new ByteArrayInputStream(file.getBytes());
-			
-	        
+			    
 	        // Declarar Scanner para realizar lectura del fichero
 			Scanner scanner = new Scanner(fileReadable);
 			
@@ -140,20 +144,59 @@ public class BaseController
 			grupo++;
 		}
 		
-		// Crear registro de Curso Etapa
-		CursoEtapaEntity cursoEtapa = new CursoEtapaEntity();
+		// Crear registro de Curso Etapa Grupo
+		CursoEtapaGrupoEntity cursoEtapaGrupo = new CursoEtapaGrupoEntity();
 		
 		// Crear campo de id con todos los campos
-		IdCursoEtapa idCursoEtapa = new IdCursoEtapa(curso, etapa, grupo);
+		IdCursoEtapaGrupo idCursoEtapaGrupo = new IdCursoEtapaGrupo(curso, etapa, grupo);
 		
 		// Asignar el id al registro de Curso Etapa
-		cursoEtapa.setIdCursoEtapa(idCursoEtapa);
+		cursoEtapaGrupo.setIdCursoEtapaGrupo(idCursoEtapaGrupo);
 		
 		// Insertar en BD
-		this.iCursoEtapaRepository.saveAndFlush(cursoEtapa);
+		this.iCursoEtapaGrupoRepository.saveAndFlush(cursoEtapaGrupo);
+		
 		// Devolver la lista
 		return ResponseEntity.status(200).body("INFO - Grupo creado correctamente");
 		
 
 	}
+	
+
+	@RequestMapping(method = RequestMethod.GET, value = "/obtenerGrupo")
+	public ResponseEntity<?> encontrarGrupo
+	(
+	        @RequestParam int curso,
+	        @RequestParam String etapa
+	) 
+	{
+	    try {
+	        // Obtener la lista de grupos según curso y etapa
+	        List<String> grupos = this.iCursoEtapaRepository.findGrupoByCursoAndEtapa(curso, etapa);
+
+	        // Si la lista está vacía, lanzar una excepción
+	        if (grupos.isEmpty()) {
+	            log.error("ERROR - No se encontraron grupos para el curso {} y etapa {}", curso, etapa);
+	            throw new MatriculasHorariosServerException(404, "ERROR - No se encontraron grupos para el curso y etapa especificados");
+	        }
+
+	        // Devolver la lista de grupos encontrados
+	        return ResponseEntity.status(200).body(grupos);
+	    } 
+	    catch (MatriculasHorariosServerException e) 
+	    {
+	        // Obtener traza del error
+	        log.error("ERROR - {}", e.getBodyExceptionMessage());
+	        return ResponseEntity.status(404).body(e.getBodyExceptionMessage());
+	    } 
+	    catch (Exception e) 
+	    {
+	        // Manejo de excepciones generales
+	        String msgError = "ERROR - No se pudo obtener la información de los grupos";
+	        log.error(msgError, e);
+	        return ResponseEntity.status(500).body(msgError);
+	    }
+	}
+
+	
 }

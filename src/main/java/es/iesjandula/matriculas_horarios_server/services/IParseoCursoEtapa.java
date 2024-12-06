@@ -6,5 +6,5 @@ import es.iesjandula.matriculas_horarios_server.utils.MatriculasHorariosServerEx
 
 public interface IParseoCursoEtapa 
 {
-	public void parseaCursoEtapa(Scanner scanner) throws MatriculasHorariosServerException;
+	public void parseoCursoEtapa(Scanner scanner) throws MatriculasHorariosServerException;
 }

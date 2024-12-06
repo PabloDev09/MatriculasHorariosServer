@@ -4,26 +4,28 @@ import java.io.Serializable;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
 @Embeddable
-public class IdAsignatura implements Serializable
+@AllArgsConstructor
+@NoArgsConstructor
+public class IdCursoEtapaGrupo implements Serializable
 {
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
 
-	@Column
+	@Column(length = 1)
 	private int curso;
 	
-	@Column(length = 50)
+	@Column(length = 20)
 	private String etapa;
 	
-	@Column(length = 2)
-	private String grupo;
+	@Column(length = 1)
+	private char grupo;
 	
-	@Column(length = 100)
-	private String nombre;
 }

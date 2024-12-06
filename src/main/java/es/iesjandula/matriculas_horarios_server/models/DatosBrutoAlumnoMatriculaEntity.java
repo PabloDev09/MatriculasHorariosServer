@@ -34,4 +34,7 @@ public class DatosBrutoAlumnoMatriculaEntity
 
     @ManyToOne
     private CursoEtapaEntity cursoEtapa;
+    
+    @ManyToOne
+    private CursoEtapaGrupoEntity cursoEtapaGrupo;
 }

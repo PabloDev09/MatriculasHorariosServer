@@ -26,7 +26,7 @@ public class ParseoCursoEtapaImpl implements IParseoCursoEtapa
 
 	
 	@Override
-	public void parseaCursoEtapa(Scanner scanner) throws MatriculasHorariosServerException 
+	public void parseoCursoEtapa(Scanner scanner) throws MatriculasHorariosServerException 
 	{	
 		
 		scanner.nextLine();

@@ -25,12 +25,4 @@ public class IdCursoEtapa implements Serializable
 	@Column(length = 50)
 	private String etapa;
 	
-	@Column(length = 1)
-	private char grupo;
-	
-	public IdCursoEtapa(int curso, String etapa)
-	{
-		this.curso = curso;
-		this.etapa = etapa;
-	}
 }
