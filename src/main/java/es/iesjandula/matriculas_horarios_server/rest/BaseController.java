@@ -1,11 +1,10 @@
 package es.iesjandula.matriculas_horarios_server.rest;
 
-
-
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.Scanner;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,11 +16,17 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import es.iesjandula.matriculas_horarios_server.dtos.AlumnoDto;
 import es.iesjandula.matriculas_horarios_server.models.CursoEtapaEntity;
 import es.iesjandula.matriculas_horarios_server.models.CursoEtapaGrupoEntity;
+import es.iesjandula.matriculas_horarios_server.models.DatosBrutoAlumnoMatriculaEntity;
+import es.iesjandula.matriculas_horarios_server.models.DatosBrutoAlumnoMatriculaGrupoEntity;
+import es.iesjandula.matriculas_horarios_server.models.ids.IdCursoEtapa;
 import es.iesjandula.matriculas_horarios_server.models.ids.IdCursoEtapaGrupo;
 import es.iesjandula.matriculas_horarios_server.repositories.ICursoEtapaGrupoRepository;
 import es.iesjandula.matriculas_horarios_server.repositories.ICursoEtapaRepository;
+import es.iesjandula.matriculas_horarios_server.repositories.IDatosBrutoAlumnoMatriculaGrupoRepository;
+import es.iesjandula.matriculas_horarios_server.repositories.IDatosBrutoAlumnoMatriculaRepository;
 import es.iesjandula.matriculas_horarios_server.services.IParseoDatosBrutos;
 import es.iesjandula.matriculas_horarios_server.utils.Constants;
 import es.iesjandula.matriculas_horarios_server.utils.MatriculasHorariosServerException;
@@ -37,6 +42,12 @@ public class BaseController
 	
 	@Autowired
 	ICursoEtapaGrupoRepository iCursoEtapaGrupoRepository;
+	
+	@Autowired
+	IDatosBrutoAlumnoMatriculaRepository iDatosBrutoAlumnoMatriculaRepository;
+	
+	@Autowired
+	IDatosBrutoAlumnoMatriculaGrupoRepository iDatosBrutoAlumnoMatriculaGrupoRepository;
 	
 	@Autowired
 	IParseoDatosBrutos iParseoDatosBrutos;
@@ -80,7 +91,9 @@ public class BaseController
 			
 			// Devolver codigo, mensaje y traza de error
 			return ResponseEntity.status(400).body(e.getBodyExceptionMessage());
-		} catch (IOException e) {
+		} 
+		catch (IOException e) 
+		{
 			String msgError = "ERROR - El fichero no se ha podido leer";
 			log.error(msgError);
 			return ResponseEntity.status(500).body(msgError);
@@ -89,7 +102,7 @@ public class BaseController
 		
 
 	@RequestMapping(method = RequestMethod.GET, value = "/obtenerCursoEtapa")
-	public ResponseEntity<?> cargarCursoEtapa()
+	public ResponseEntity<?> obtenerCursoEtapa()
 	{
 		try 
 		{
@@ -119,12 +132,13 @@ public class BaseController
 			// Devolver codigo, mensaje y traza de error
 			return ResponseEntity.status(404).body(e.getBodyExceptionMessage());
 		}
-		
-
 	}
 	
 	@RequestMapping(method = RequestMethod.POST, value = "/grupos")
-	public ResponseEntity<?> crearGrupo(@RequestParam CursoEtapaEntity cursoEtapaEntity)
+	public ResponseEntity<?> crearGrupo
+	(
+			@RequestParam CursoEtapaEntity cursoEtapaEntity
+	)
 	{
 		// Curso donde crear el grupo
 		int curso = cursoEtapaEntity.getIdCursoEtapa().getCurso();
@@ -133,7 +147,7 @@ public class BaseController
 		String etapa = cursoEtapaEntity.getIdCursoEtapa().getEtapa();
 		
 		// Numero de veces repetido el Curso Etapa en la BD
-		int contador = this.iCursoEtapaRepository.findCountByCursoAndEtapa(curso, etapa);
+		int contador = this.iCursoEtapaGrupoRepository.findCountByCursoAndEtapa(curso, etapa);
 		
 		// Asignar la letra A
 		char grupo = Constants.GROUP;
@@ -158,25 +172,24 @@ public class BaseController
 		
 		// Devolver la lista
 		return ResponseEntity.status(200).body("INFO - Grupo creado correctamente");
-		
-
 	}
 	
 
-	@RequestMapping(method = RequestMethod.GET, value = "/obtenerGrupo")
-	public ResponseEntity<?> encontrarGrupo
+	@RequestMapping(method = RequestMethod.GET, value = "/grupos")
+	public ResponseEntity<?> obtenerGrupo
 	(
-	        @RequestParam int curso,
-	        @RequestParam String etapa
+	        @RequestParam CursoEtapaEntity cursoEtapa
 	) 
 	{
-	    try {
+	    try 
+	    {
 	        // Obtener la lista de grupos según curso y etapa
-	        List<String> grupos = this.iCursoEtapaRepository.findGrupoByCursoAndEtapa(curso, etapa);
+	        List<String> grupos = this.iCursoEtapaGrupoRepository.findGrupoByCursoAndEtapa(cursoEtapa.getIdCursoEtapa().getCurso(), cursoEtapa.getIdCursoEtapa().getEtapa());
 
 	        // Si la lista está vacía, lanzar una excepción
-	        if (grupos.isEmpty()) {
-	            log.error("ERROR - No se encontraron grupos para el curso {} y etapa {}", curso, etapa);
+	        if (grupos.isEmpty()) 
+	        {
+	            log.error("ERROR - No se encontraron grupos para el curso {} y etapa {}", cursoEtapa.getIdCursoEtapa().getCurso(), cursoEtapa.getIdCursoEtapa().getEtapa());
 	            throw new MatriculasHorariosServerException(404, "ERROR - No se encontraron grupos para el curso y etapa especificados");
 	        }
 
@@ -198,5 +211,170 @@ public class BaseController
 	    }
 	}
 
+	@RequestMapping(method = RequestMethod.DELETE, value = "/grupos")
+	public ResponseEntity<?> eliminarGrupo
+	(
+	        @RequestParam CursoEtapaGrupoEntity cursoEtapaGrupo
+	) 
+	{
+	    try 
+	    {
+	    	// Obtener los alumnos asignados al grupo a eliminar
+	    	List<DatosBrutoAlumnoMatriculaGrupoEntity> alumnosAsignadosAlGrupo = iDatosBrutoAlumnoMatriculaGrupoRepository.findAllByCursoEtapaGrupo(cursoEtapaGrupo);
+	    	
+	    	for(DatosBrutoAlumnoMatriculaGrupoEntity alumno : alumnosAsignadosAlGrupo)
+	    	{
+	    		// Registro de DatosBrutoAlumnoMatriculaEntity
+	    		DatosBrutoAlumnoMatriculaEntity datosBrutoAlumnoMatriculaEntity = new DatosBrutoAlumnoMatriculaEntity();
+	    		
+	    		// Crear CursoEtapa del Alumno
+	    		CursoEtapaEntity cursoEtapa = new CursoEtapaEntity();
+	    		IdCursoEtapa idCursoEtapa =  new IdCursoEtapa();
+	    		idCursoEtapa.setCurso(alumno.getCursoEtapaGrupo().getIdCursoEtapaGrupo().getCurso());
+	    		idCursoEtapa.setEtapa(alumno.getCursoEtapaGrupo().getIdCursoEtapaGrupo().getEtapa());
+	    		cursoEtapa.setIdCursoEtapa(idCursoEtapa);
+	    		
+	    		// Asignar alumno a registro de DatosBrutoAlumnoMatriculaEntity
+	    		datosBrutoAlumnoMatriculaEntity.setNombre(alumno.getNombre());
+	    		datosBrutoAlumnoMatriculaEntity.setApellidos(alumno.getApellidos());
+	    		datosBrutoAlumnoMatriculaEntity.setAsignatura(alumno.getAsignatura());
+	    		datosBrutoAlumnoMatriculaEntity.setCursoEtapa(cursoEtapa);
+	    		
+	    		// Guardar el registro en BD
+	    		iDatosBrutoAlumnoMatriculaRepository.saveAndFlush(datosBrutoAlumnoMatriculaEntity);
+	    	}
+	    	
+	    	// Eliminar los alumnos asignados al grupo de la tabla DatosBrutoAlumnoMatriculaGrupo
+	    	iDatosBrutoAlumnoMatriculaGrupoRepository.deleteAll(alumnosAsignadosAlGrupo);
+	    	
+	    	// Eliminar el grupo en la tabla CursoEtapaGrupo
+	    	iCursoEtapaGrupoRepository.delete(cursoEtapaGrupo);
+	    	
+	    	// Devolver mensaje de OK
+	    	return ResponseEntity.status(200).body("INFO - Grupo eliminado correctamente");
+	    }
+	    catch (Exception e) 
+	    {
+	        // Manejo de excepciones generales
+	        String msgError = "ERROR - No se pudo eliminar el grupo";
+	        log.error(msgError, e);
+	        return ResponseEntity.status(500).body(msgError);
+	    }
+	}
 	
+	@RequestMapping(method = RequestMethod.POST, value = "/grupos/alumnos")
+	public ResponseEntity<?> asignarAlumnos
+	(
+	        @RequestParam List<AlumnoDto> alumnos,
+	        @RequestParam CursoEtapaGrupoEntity cursoEtapaGrupo
+	) 
+	{
+	    try 
+	    {
+	    	// Crear registro de la Tabla DatosBrutosAlumnoMatriculaGrupo
+	    	DatosBrutoAlumnoMatriculaGrupoEntity datosBrutoAlumnoMatriculaGrupo = new DatosBrutoAlumnoMatriculaGrupoEntity();
+
+	    	// Por cada alumno buscarlo en DatosBrutosAlumnoMatricula y añadirlos a DatosBrutosAlumnoMatriculaGrupo, eliminando los registros de la tabla Prikera
+	    	for(AlumnoDto alumno : alumnos)
+	    	{
+	    		// Optional de DatosBrutoAlumnoMatriculaEntity
+	    		Optional<DatosBrutoAlumnoMatriculaEntity> datosBrutoAlumnoMatriculaOpt;
+	    		
+	    		// Buscar el registro en DatosBrutosAlumnoMatricula
+	    		datosBrutoAlumnoMatriculaOpt = iDatosBrutoAlumnoMatriculaRepository.findByNombreAndApellidos(alumno.getNombre(), alumno.getApellidos());
+	    		
+	    		// Si no existe el AlumnoDto
+	    		if(!datosBrutoAlumnoMatriculaOpt.isPresent())
+	    		{
+	    			// Mensaje de error
+	    	        String msgError = "ERROR - No se encontro los datos de un alumno";
+	    	        
+	    	        // Mostrar el error a través de un log
+	    	        log.error(msgError); 
+	    	        
+	    	        // Lanzar excepcion con mensaje de error
+	    	        throw new MatriculasHorariosServerException(msgError);
+	    		}
+	    		
+	    		// Asignar cada uno de los campos 
+	    		datosBrutoAlumnoMatriculaGrupo.setNombre(datosBrutoAlumnoMatriculaOpt.get().getNombre());
+	    		datosBrutoAlumnoMatriculaGrupo.setApellidos(datosBrutoAlumnoMatriculaOpt.get().getApellidos());
+	    		datosBrutoAlumnoMatriculaGrupo.setAsignatura(datosBrutoAlumnoMatriculaOpt.get().getAsignatura());
+	    		datosBrutoAlumnoMatriculaGrupo.setCursoEtapaGrupo(cursoEtapaGrupo);
+	    		
+	    		// Guardar el registro en la tabla DatosBrutoAlumnoMatriculaGrupo
+	    		iDatosBrutoAlumnoMatriculaGrupoRepository.saveAndFlush(datosBrutoAlumnoMatriculaGrupo);
+	    		
+	    		// Eliminar el registro en la tabla DatosBrutoAlumnoMatricula
+	    		iDatosBrutoAlumnoMatriculaRepository.delete(datosBrutoAlumnoMatriculaOpt.get());
+	    	}
+	        // Devolver mensaje de OK
+	        return ResponseEntity.status(200).body("INFO - Alumnos asignados correctamente con el curso" + cursoEtapaGrupo.getIdCursoEtapaGrupo().getCurso() + cursoEtapaGrupo.getIdCursoEtapaGrupo().getEtapa() + cursoEtapaGrupo.getIdCursoEtapaGrupo().getGrupo());
+	    } 
+	    catch (Exception e) 
+	    {
+	        // Manejo de excepciones generales
+	        String msgError = "ERROR - No se pudo asginar los alumnos al curso";
+	        log.error(msgError);
+	        return ResponseEntity.status(500).body(msgError);
+	    }
+	}
+	
+	@RequestMapping(method = RequestMethod.DELETE, value = "/grupos/alumnos")
+	public ResponseEntity<?> desasignarAlumno
+	(
+	        @RequestParam AlumnoDto alumno
+	) 
+	{
+	    try 
+	    {
+	    	// Optional DatosBrutoAlumnoMatriculaGrupo
+	    	Optional<DatosBrutoAlumnoMatriculaGrupoEntity> datosBrutoAlumnoMatriculaGrupoOpt= iDatosBrutoAlumnoMatriculaGrupoRepository.findByNombreAndApellidos(alumno.getNombre(), alumno.getApellidos());
+	    	
+	    	// Si no existe
+	    	if(!datosBrutoAlumnoMatriculaGrupoOpt.isPresent())
+	    	{
+    			// Mensaje de error
+    	        String msgError = "ERROR - No se encontro los datos del alumno";
+    	        
+    	        // Mostrar el error a través de un log
+    	        log.error(msgError); 
+    	        
+    	        // Lanzar excepcion con mensaje de error
+    	        throw new MatriculasHorariosServerException(msgError);
+	    	}
+	    	
+	    	// Crear registro DatosBrutoAlumnoMatricula 
+	    	DatosBrutoAlumnoMatriculaEntity datosBrutoAlumnoMatricula = new DatosBrutoAlumnoMatriculaEntity();
+	        
+    		// Crear CursoEtapa del Alumno
+    		CursoEtapaEntity cursoEtapa = new CursoEtapaEntity();
+    		IdCursoEtapa idCursoEtapa =  new IdCursoEtapa();
+    		idCursoEtapa.setCurso(datosBrutoAlumnoMatriculaGrupoOpt.get().getCursoEtapaGrupo().getIdCursoEtapaGrupo().getCurso());
+    		idCursoEtapa.setEtapa(datosBrutoAlumnoMatriculaGrupoOpt.get().getCursoEtapaGrupo().getIdCursoEtapaGrupo().getEtapa());
+    		cursoEtapa.setIdCursoEtapa(idCursoEtapa);
+    		
+    		// Asignar alumno a registro de DatosBrutoAlumnoMatriculaEntity
+    		datosBrutoAlumnoMatricula.setNombre(datosBrutoAlumnoMatriculaGrupoOpt.get().getNombre());
+    		datosBrutoAlumnoMatricula.setApellidos(datosBrutoAlumnoMatriculaGrupoOpt.get().getApellidos());
+    		datosBrutoAlumnoMatricula.setAsignatura(datosBrutoAlumnoMatriculaGrupoOpt.get().getAsignatura());
+    		datosBrutoAlumnoMatricula.setCursoEtapa(cursoEtapa);
+    		
+    		// Guardar el registro en la tabla DatosBrutoAlumnoMatricula
+    		iDatosBrutoAlumnoMatriculaRepository.saveAndFlush(datosBrutoAlumnoMatricula);
+    		
+    		// Eliminar el registro en la tabla DatosBrutoAlumnoMatriculaGrupo
+    		iDatosBrutoAlumnoMatriculaGrupoRepository.delete(datosBrutoAlumnoMatriculaGrupoOpt.get());
+    		
+	    	// Devolver mensaje de OK
+	        return ResponseEntity.status(200).body("INFO - Alumno desasignado correctamente");
+	    } 
+	    catch (Exception e) 
+	    {
+	        // Manejo de excepciones generales
+	        String msgError = "ERROR - No se pudo asginar los alumnos al curso";
+	        log.error(msgError);
+	        return ResponseEntity.status(500).body(msgError);
+	    }
+	}
 }

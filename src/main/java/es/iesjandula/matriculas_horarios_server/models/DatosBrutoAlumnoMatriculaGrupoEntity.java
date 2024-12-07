@@ -16,8 +16,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name = "Datos_Bruto_Alumno_Matricula")
-public class DatosBrutoAlumnoMatriculaEntity 
+@Table(name = "Datos_Bruto_Alumno_Matricula_Grupo")
+public class DatosBrutoAlumnoMatriculaGrupoEntity 
 {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -33,6 +33,5 @@ public class DatosBrutoAlumnoMatriculaEntity
     private String asignatura;
 
     @ManyToOne
-    private CursoEtapaEntity cursoEtapa;
-    
+    private CursoEtapaGrupoEntity cursoEtapaGrupo;
 }
