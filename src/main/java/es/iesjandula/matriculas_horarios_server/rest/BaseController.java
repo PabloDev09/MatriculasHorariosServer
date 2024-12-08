@@ -69,16 +69,16 @@ public class BaseController
 		try 
 		{
 			// Si el archivo esta vacio
-			if(file.isEmpty())
+			if(archivo.isEmpty())
 			{
 				throw new MatriculasHorariosServerException(400, "ERROR - El archivo importado está vacio");
 			}
 			
 	        // Convertir MultipartFile a Readable 
-	        ByteArrayInputStream fileReadable = new ByteArrayInputStream(file.getBytes());
+	        ByteArrayInputStream archivoReadable = new ByteArrayInputStream(archivo.getBytes());
 			    
 	        // Declarar Scanner para realizar lectura del fichero
-			Scanner scanner = new Scanner(fileReadable);
+			Scanner scanner = new Scanner(archivoReadable);
 			
 			// Llamar al Service IParseoDatosBrutos para realizar parseo
 			this.iParseoDatosBrutos.parseoDatosBrutos(scanner, cursoEtapa);
