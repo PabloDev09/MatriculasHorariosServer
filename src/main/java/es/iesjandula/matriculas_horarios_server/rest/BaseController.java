@@ -63,7 +63,7 @@ public class BaseController
 	public ResponseEntity<?> cargarMatriculas 
 	(
 			@RequestPart("cursoEtapa") CursoEtapa cursoEtapa,
-			@RequestParam("file") MultipartFile file
+			@RequestParam("archivo") MultipartFile archivo
 	)
 	{
 		try 
