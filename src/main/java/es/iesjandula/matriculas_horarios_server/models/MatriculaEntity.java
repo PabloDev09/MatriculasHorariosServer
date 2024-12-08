@@ -27,4 +27,14 @@ public class MatriculaEntity {
     })
     private AsignaturaEntity asignatura;
 
+    
+    public AsignaturaEntity getAsignatura() {
+        return asignatura;
+
+    }
+    
+    
+    public IdMatricula getId() {
+        return id;
+    }
 }

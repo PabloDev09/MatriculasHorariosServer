@@ -1,5 +1,7 @@
 package es.iesjandula.matriculas_horarios_server.dtos;
 
+import java.util.List;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -12,4 +14,8 @@ public class AlumnoDto
 	
 	private String nombre;
 	private String apellidos;
+	
+	 private List<String> asignados;   // Lista de alumnos asignados
+	    private List<String> pendientes; // Lista de alumnos pendientes
+	
 }

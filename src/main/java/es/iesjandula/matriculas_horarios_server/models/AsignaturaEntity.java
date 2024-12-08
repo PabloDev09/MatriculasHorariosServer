@@ -37,4 +37,7 @@ public class AsignaturaEntity
 	
 	@OneToMany(mappedBy = "asignatura")
 	private List<MatriculaEntity> matriculas;
+	
+	
+
 }	
