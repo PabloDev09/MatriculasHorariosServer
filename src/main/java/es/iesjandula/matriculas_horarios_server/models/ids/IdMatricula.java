@@ -4,8 +4,6 @@ import java.io.Serializable;
 
 import es.iesjandula.matriculas_horarios_server.models.Alumno;
 import es.iesjandula.matriculas_horarios_server.models.Asignatura;
-import es.iesjandula.matriculas_horarios_server.models.Profesor;
-import es.iesjandula.matriculas_horarios_server.models.Reduccion;
 import jakarta.persistence.Embeddable;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinColumns;

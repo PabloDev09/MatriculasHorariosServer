@@ -1,20 +1,18 @@
 package es.iesjandula.matriculas_horarios_server.services;
 
-import es.iesjandula.matriculas_horarios_server.dtos.AlumnoDto;
-import es.iesjandula.matriculas_horarios_server.repositories.IAlumnoRepository;
-import es.iesjandula.matriculas_horarios_server.repositories.IMatriculaRepository;
-import es.iesjandula.matriculas_horarios_server.repositories.IDatosBrutoAlumnoMatriculaRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import es.iesjandula.matriculas_horarios_server.dtos.AlumnoDto;
+import es.iesjandula.matriculas_horarios_server.repositories.IAlumnoRepository;
+import es.iesjandula.matriculas_horarios_server.repositories.IDatosBrutoAlumnoMatriculaRepository;
+import es.iesjandula.matriculas_horarios_server.repositories.IMatriculaRepository;
+
 @Service
 public class AlumnoService {
-
-    @Autowired
-    private IAlumnoRepository alumnoRepository;
 
     @Autowired
     private IMatriculaRepository matriculaRepository;
@@ -34,13 +32,11 @@ public class AlumnoService {
             .collect(Collectors.toList());
     }
  
-   
-    
     
     /**
      * Obtiene los alumnos asignados y pendientes según el curso, etapa y grupo.
      */
-    public AlumnoDto obtenerAlumnosPorCursoEtapaGrupo(String curso, String etapa, String grupo) {
+    public List<AlumnoDto> obtenerAlumnosPorCursoEtapaGrupo(String curso, String etapa, String grupo) {
         // Obtener los alumnos asignados
         List<String> asignados = obtenerIdsAlumnos(curso, etapa, grupo);
 
@@ -54,7 +50,10 @@ public class AlumnoService {
                 .filter(alumno -> !asignados.contains(alumno))
                 .collect(Collectors.toList());
 
-        // Crear y retornar el DTO
-        return new AlumnoDto(grupo, grupo, asignados, pendientes);
+        // Mete aqui cada AlumnoDto
+        List<AlumnoDto> alumnosAsignadosYPendientes = List.of();
+        
+        // Crear y retornar el DTO -> Esto tiene que devolver -> List<AlumnoDto> con los alumnos asignados y pendientes de asignar
+        return alumnosAsignadosYPendientes;
     }
 }

@@ -10,12 +10,7 @@ import java.util.Scanner;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-
 import org.springframework.web.bind.annotation.RequestBody;
-
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestHeader;
-
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -405,7 +400,7 @@ public class BaseController
 
 
 	    @RequestMapping()
-	    public AlumnoDto obtenerAlumnos
+	    public List<AlumnoDto> obtenerAlumnos
 	    (
 	    		@RequestParam String curso, 
 	            @RequestParam String etapa, 

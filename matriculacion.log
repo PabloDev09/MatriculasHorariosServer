@@ -1022,3 +1022,4 @@ org.apache.tomcat.util.http.fileupload.FileUploadException: the request was reje
 2024-12-08T20:34:19.072+01:00  INFO 9840 --- [http-nio-8080-exec-2] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
 2024-12-08T20:34:19.074+01:00  INFO 9840 --- [http-nio-8080-exec-2] o.s.web.servlet.DispatcherServlet        : Completed initialization in 2 ms
 2024-12-08T20:34:19.164+01:00  WARN 9840 --- [http-nio-8080-exec-2] .w.s.m.s.DefaultHandlerExceptionResolver : Resolved [org.springframework.web.HttpMediaTypeNotSupportedException: Content-Type 'application/octet-stream' is not supported]
+2024-12-08T21:07:46.843+01:00  WARN 9840 --- [http-nio-8080-exec-5] .w.s.m.s.DefaultHandlerExceptionResolver : Resolved [org.springframework.web.HttpMediaTypeNotSupportedException: Content-Type 'application/octet-stream' is not supported]
