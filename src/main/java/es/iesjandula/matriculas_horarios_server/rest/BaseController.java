@@ -10,7 +10,12 @@ import java.util.Scanner;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+
 import org.springframework.web.bind.annotation.RequestBody;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestHeader;
+
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -29,6 +34,7 @@ import es.iesjandula.matriculas_horarios_server.repositories.ICursoEtapaGrupoRep
 import es.iesjandula.matriculas_horarios_server.repositories.ICursoEtapaRepository;
 import es.iesjandula.matriculas_horarios_server.repositories.IDatosBrutoAlumnoMatriculaGrupoRepository;
 import es.iesjandula.matriculas_horarios_server.repositories.IDatosBrutoAlumnoMatriculaRepository;
+import es.iesjandula.matriculas_horarios_server.services.AlumnoService;
 import es.iesjandula.matriculas_horarios_server.services.IParseoDatosBrutos;
 import es.iesjandula.matriculas_horarios_server.utils.Constants;
 import es.iesjandula.matriculas_horarios_server.utils.MatriculasHorariosServerException;
@@ -53,6 +59,9 @@ public class BaseController
 	
 	@Autowired
 	IParseoDatosBrutos iParseoDatosBrutos;
+	
+    @Autowired
+    AlumnoService alumnoService;
 	
 	
 	@RequestMapping(method = RequestMethod.POST, value = "/cargarMatriculas", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
@@ -388,4 +397,25 @@ public class BaseController
 	        return ResponseEntity.status(500).body(msgError);
 	    }
 	}
+	
+	
+	
+
+
+
+
+	    @RequestMapping()
+	    public AlumnoDto obtenerAlumnos
+	    (
+	    		@RequestParam String curso, 
+	            @RequestParam String etapa, 
+	            @RequestParam String grupo
+	                                     
+	    		
+	    		
+	    ) 
+	    {
+	        return alumnoService.obtenerAlumnosPorCursoEtapaGrupo(curso, etapa, grupo);
+	    }
+	
 }

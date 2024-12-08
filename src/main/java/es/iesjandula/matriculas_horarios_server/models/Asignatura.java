@@ -37,4 +37,5 @@ public class Asignatura
 	
 	@OneToMany(mappedBy = "asignatura")
 	private List<Matricula> matriculas;
+
 }	

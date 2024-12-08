@@ -4,13 +4,19 @@ import java.io.Serializable;
 
 import es.iesjandula.matriculas_horarios_server.models.Alumno;
 import es.iesjandula.matriculas_horarios_server.models.Asignatura;
+import es.iesjandula.matriculas_horarios_server.models.Profesor;
+import es.iesjandula.matriculas_horarios_server.models.Reduccion;
 import jakarta.persistence.Embeddable;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinColumns;
 import jakarta.persistence.ManyToOne;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
 @Embeddable
 public class IdMatricula implements Serializable {
 

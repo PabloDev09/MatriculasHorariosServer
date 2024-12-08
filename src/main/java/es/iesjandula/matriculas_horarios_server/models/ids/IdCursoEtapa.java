@@ -9,9 +9,9 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
-@Embeddable
 @AllArgsConstructor
 @NoArgsConstructor
+@Embeddable
 public class IdCursoEtapa implements Serializable
 {
 	/**
