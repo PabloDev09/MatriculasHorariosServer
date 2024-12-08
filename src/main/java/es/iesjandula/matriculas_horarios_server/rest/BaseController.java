@@ -8,19 +8,21 @@ import java.util.Optional;
 import java.util.Scanner;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import es.iesjandula.matriculas_horarios_server.dtos.AlumnoDto;
-import es.iesjandula.matriculas_horarios_server.models.CursoEtapaEntity;
-import es.iesjandula.matriculas_horarios_server.models.CursoEtapaGrupoEntity;
-import es.iesjandula.matriculas_horarios_server.models.DatosBrutoAlumnoMatriculaEntity;
-import es.iesjandula.matriculas_horarios_server.models.DatosBrutoAlumnoMatriculaGrupoEntity;
+import es.iesjandula.matriculas_horarios_server.models.CursoEtapa;
+import es.iesjandula.matriculas_horarios_server.models.CursoEtapaGrupo;
+import es.iesjandula.matriculas_horarios_server.models.DatosBrutoAlumnoMatricula;
+import es.iesjandula.matriculas_horarios_server.models.DatosBrutoAlumnoMatriculaGrupo;
 import es.iesjandula.matriculas_horarios_server.models.ids.IdCursoEtapa;
 import es.iesjandula.matriculas_horarios_server.models.ids.IdCursoEtapaGrupo;
 import es.iesjandula.matriculas_horarios_server.repositories.ICursoEtapaGrupoRepository;
@@ -53,11 +55,11 @@ public class BaseController
 	IParseoDatosBrutos iParseoDatosBrutos;
 	
 	
-	@RequestMapping(method = RequestMethod.POST, value = "/cargarDatosBrutos")
+	@RequestMapping(method = RequestMethod.POST, value = "/cargarMatriculas", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 	public ResponseEntity<?> cargarMatriculas 
 	(
-			@RequestHeader CursoEtapaEntity cursoEtapaEntity,
-			@RequestHeader MultipartFile file
+			@RequestPart("cursoEtapa") CursoEtapa cursoEtapa,
+			@RequestParam("file") MultipartFile file
 	)
 	{
 		try 
@@ -75,7 +77,7 @@ public class BaseController
 			Scanner scanner = new Scanner(fileReadable);
 			
 			// Llamar al Service IParseoDatosBrutos para realizar parseo
-			this.iParseoDatosBrutos.parseoDatosBrutos(scanner, cursoEtapaEntity);
+			this.iParseoDatosBrutos.parseoDatosBrutos(scanner, cursoEtapa);
 			
 			log.info("INFO - Se ha enviado todo correctamente");
 			
@@ -107,7 +109,7 @@ public class BaseController
 		try 
 		{
 			// Lista usada para guardar los registros de la Tabla CursoEtapa
-			List<CursoEtapaEntity> listaCursoEtapa= new ArrayList<>();
+			List<CursoEtapa> listaCursoEtapa= new ArrayList<>();
 			
 			// Asignar los registros de la Tabla CursoEtapa
 			listaCursoEtapa = this.iCursoEtapaRepository.findAll();
@@ -137,14 +139,14 @@ public class BaseController
 	@RequestMapping(method = RequestMethod.POST, value = "/grupos")
 	public ResponseEntity<?> crearGrupo
 	(
-			@RequestParam CursoEtapaEntity cursoEtapaEntity
+			@RequestBody CursoEtapa cursoEtapa
 	)
 	{
 		// Curso donde crear el grupo
-		int curso = cursoEtapaEntity.getIdCursoEtapa().getCurso();
+		int curso = cursoEtapa.getIdCursoEtapa().getCurso();
 		
 		// Etapa donde crear el grupo
-		String etapa = cursoEtapaEntity.getIdCursoEtapa().getEtapa();
+		String etapa = cursoEtapa.getIdCursoEtapa().getEtapa();
 		
 		// Numero de veces repetido el Curso Etapa en la BD
 		int contador = this.iCursoEtapaGrupoRepository.findCountByCursoAndEtapa(curso, etapa);
@@ -159,7 +161,7 @@ public class BaseController
 		}
 		
 		// Crear registro de Curso Etapa Grupo
-		CursoEtapaGrupoEntity cursoEtapaGrupo = new CursoEtapaGrupoEntity();
+		CursoEtapaGrupo cursoEtapaGrupo = new CursoEtapaGrupo();
 		
 		// Crear campo de id con todos los campos
 		IdCursoEtapaGrupo idCursoEtapaGrupo = new IdCursoEtapaGrupo(curso, etapa, grupo);
@@ -178,7 +180,7 @@ public class BaseController
 	@RequestMapping(method = RequestMethod.GET, value = "/grupos")
 	public ResponseEntity<?> obtenerGrupo
 	(
-	        @RequestParam CursoEtapaEntity cursoEtapa
+	        @RequestBody CursoEtapa cursoEtapa
 	) 
 	{
 	    try 
@@ -214,34 +216,34 @@ public class BaseController
 	@RequestMapping(method = RequestMethod.DELETE, value = "/grupos")
 	public ResponseEntity<?> eliminarGrupo
 	(
-	        @RequestParam CursoEtapaGrupoEntity cursoEtapaGrupo
+	        @RequestBody CursoEtapaGrupo cursoEtapaGrupo
 	) 
 	{
 	    try 
 	    {
 	    	// Obtener los alumnos asignados al grupo a eliminar
-	    	List<DatosBrutoAlumnoMatriculaGrupoEntity> alumnosAsignadosAlGrupo = iDatosBrutoAlumnoMatriculaGrupoRepository.findAllByCursoEtapaGrupo(cursoEtapaGrupo);
+	    	List<DatosBrutoAlumnoMatriculaGrupo> alumnosAsignadosAlGrupo = iDatosBrutoAlumnoMatriculaGrupoRepository.findAllByCursoEtapaGrupo(cursoEtapaGrupo);
 	    	
-	    	for(DatosBrutoAlumnoMatriculaGrupoEntity alumno : alumnosAsignadosAlGrupo)
+    		// Registro de DatosBrutoAlumnoMatriculaEntity
+    		DatosBrutoAlumnoMatricula datosBrutoAlumnoMatricula = new DatosBrutoAlumnoMatricula();
+    		
+    		// Crear CursoEtapa del Alumno
+    		CursoEtapa cursoEtapa = new CursoEtapa();
+    		IdCursoEtapa idCursoEtapa =  new IdCursoEtapa();
+    		idCursoEtapa.setCurso(cursoEtapaGrupo.getIdCursoEtapaGrupo().getCurso());
+    		idCursoEtapa.setEtapa(cursoEtapaGrupo.getIdCursoEtapaGrupo().getEtapa());
+    		cursoEtapa.setIdCursoEtapa(idCursoEtapa);
+	    	
+	    	for(DatosBrutoAlumnoMatriculaGrupo alumno : alumnosAsignadosAlGrupo)
 	    	{
-	    		// Registro de DatosBrutoAlumnoMatriculaEntity
-	    		DatosBrutoAlumnoMatriculaEntity datosBrutoAlumnoMatriculaEntity = new DatosBrutoAlumnoMatriculaEntity();
-	    		
-	    		// Crear CursoEtapa del Alumno
-	    		CursoEtapaEntity cursoEtapa = new CursoEtapaEntity();
-	    		IdCursoEtapa idCursoEtapa =  new IdCursoEtapa();
-	    		idCursoEtapa.setCurso(alumno.getCursoEtapaGrupo().getIdCursoEtapaGrupo().getCurso());
-	    		idCursoEtapa.setEtapa(alumno.getCursoEtapaGrupo().getIdCursoEtapaGrupo().getEtapa());
-	    		cursoEtapa.setIdCursoEtapa(idCursoEtapa);
-	    		
 	    		// Asignar alumno a registro de DatosBrutoAlumnoMatriculaEntity
-	    		datosBrutoAlumnoMatriculaEntity.setNombre(alumno.getNombre());
-	    		datosBrutoAlumnoMatriculaEntity.setApellidos(alumno.getApellidos());
-	    		datosBrutoAlumnoMatriculaEntity.setAsignatura(alumno.getAsignatura());
-	    		datosBrutoAlumnoMatriculaEntity.setCursoEtapa(cursoEtapa);
+	    		datosBrutoAlumnoMatricula.setNombre(alumno.getNombre());
+	    		datosBrutoAlumnoMatricula.setApellidos(alumno.getApellidos());
+	    		datosBrutoAlumnoMatricula.setAsignatura(alumno.getAsignatura());
+	    		datosBrutoAlumnoMatricula.setCursoEtapa(cursoEtapa);
 	    		
 	    		// Guardar el registro en BD
-	    		iDatosBrutoAlumnoMatriculaRepository.saveAndFlush(datosBrutoAlumnoMatriculaEntity);
+	    		iDatosBrutoAlumnoMatriculaRepository.saveAndFlush(datosBrutoAlumnoMatricula);
 	    	}
 	    	
 	    	// Eliminar los alumnos asignados al grupo de la tabla DatosBrutoAlumnoMatriculaGrupo
@@ -265,48 +267,52 @@ public class BaseController
 	@RequestMapping(method = RequestMethod.POST, value = "/grupos/alumnos")
 	public ResponseEntity<?> asignarAlumnos
 	(
-	        @RequestParam List<AlumnoDto> alumnos,
-	        @RequestParam CursoEtapaGrupoEntity cursoEtapaGrupo
+	        @RequestBody List<AlumnoDto> alumnos,
+	        @RequestBody CursoEtapaGrupo cursoEtapaGrupo
 	) 
 	{
 	    try 
 	    {
 	    	// Crear registro de la Tabla DatosBrutosAlumnoMatriculaGrupo
-	    	DatosBrutoAlumnoMatriculaGrupoEntity datosBrutoAlumnoMatriculaGrupo = new DatosBrutoAlumnoMatriculaGrupoEntity();
+	    	DatosBrutoAlumnoMatriculaGrupo datosBrutoAlumnoMatriculaGrupo = new DatosBrutoAlumnoMatriculaGrupo();
 
 	    	// Por cada alumno buscarlo en DatosBrutosAlumnoMatricula y añadirlos a DatosBrutosAlumnoMatriculaGrupo, eliminando los registros de la tabla Prikera
 	    	for(AlumnoDto alumno : alumnos)
 	    	{
 	    		// Optional de DatosBrutoAlumnoMatriculaEntity
-	    		Optional<DatosBrutoAlumnoMatriculaEntity> datosBrutoAlumnoMatriculaOpt;
+	    		List<Optional<DatosBrutoAlumnoMatricula>> datosBrutoAlumnoMatriculaAsignaturasOpt;
 	    		
-	    		// Buscar el registro en DatosBrutosAlumnoMatricula
-	    		datosBrutoAlumnoMatriculaOpt = iDatosBrutoAlumnoMatriculaRepository.findByNombreAndApellidos(alumno.getNombre(), alumno.getApellidos());
+	    		// Buscar los registros del alumno en DatosBrutosAlumnoMatricula
+	    		datosBrutoAlumnoMatriculaAsignaturasOpt = iDatosBrutoAlumnoMatriculaRepository.findByNombreAndApellidos(alumno.getNombre(), alumno.getApellidos());
 	    		
-	    		// Si no existe el AlumnoDto
-	    		if(!datosBrutoAlumnoMatriculaOpt.isPresent())
+	    		for(Optional<DatosBrutoAlumnoMatricula> datosBrutoAlumnoMatriculaAsignaturaOpt : datosBrutoAlumnoMatriculaAsignaturasOpt)
 	    		{
-	    			// Mensaje de error
-	    	        String msgError = "ERROR - No se encontro los datos de un alumno";
-	    	        
-	    	        // Mostrar el error a través de un log
-	    	        log.error(msgError); 
-	    	        
-	    	        // Lanzar excepcion con mensaje de error
-	    	        throw new MatriculasHorariosServerException(msgError);
+		    		// Si no existe el AlumnoDto
+		    		if(!datosBrutoAlumnoMatriculaAsignaturaOpt.isPresent())
+		    		{
+		    			// Mensaje de error
+		    	        String msgError = "ERROR - No se encontro los datos de un alumno";
+		    	        
+		    	        // Mostrar el error a través de un log
+		    	        log.error(msgError); 
+		    	        
+		    	        // Lanzar excepcion con mensaje de error
+		    	        throw new MatriculasHorariosServerException(msgError);
+		    		}
+		    		
+		    		// Asignar cada uno de los campos 
+		    		datosBrutoAlumnoMatriculaGrupo.setNombre(datosBrutoAlumnoMatriculaAsignaturaOpt.get().getNombre());
+		    		datosBrutoAlumnoMatriculaGrupo.setApellidos(datosBrutoAlumnoMatriculaAsignaturaOpt.get().getApellidos());
+		    		datosBrutoAlumnoMatriculaGrupo.setAsignatura(datosBrutoAlumnoMatriculaAsignaturaOpt.get().getAsignatura());
+		    		datosBrutoAlumnoMatriculaGrupo.setCursoEtapaGrupo(cursoEtapaGrupo);
+		    		
+		    		// Guardar el registro en la tabla DatosBrutoAlumnoMatriculaGrupo
+		    		iDatosBrutoAlumnoMatriculaGrupoRepository.saveAndFlush(datosBrutoAlumnoMatriculaGrupo);
+		    		
+		    		// Eliminar el registro en la tabla DatosBrutoAlumnoMatricula
+		    		iDatosBrutoAlumnoMatriculaRepository.delete(datosBrutoAlumnoMatriculaAsignaturaOpt.get());
 	    		}
-	    		
-	    		// Asignar cada uno de los campos 
-	    		datosBrutoAlumnoMatriculaGrupo.setNombre(datosBrutoAlumnoMatriculaOpt.get().getNombre());
-	    		datosBrutoAlumnoMatriculaGrupo.setApellidos(datosBrutoAlumnoMatriculaOpt.get().getApellidos());
-	    		datosBrutoAlumnoMatriculaGrupo.setAsignatura(datosBrutoAlumnoMatriculaOpt.get().getAsignatura());
-	    		datosBrutoAlumnoMatriculaGrupo.setCursoEtapaGrupo(cursoEtapaGrupo);
-	    		
-	    		// Guardar el registro en la tabla DatosBrutoAlumnoMatriculaGrupo
-	    		iDatosBrutoAlumnoMatriculaGrupoRepository.saveAndFlush(datosBrutoAlumnoMatriculaGrupo);
-	    		
-	    		// Eliminar el registro en la tabla DatosBrutoAlumnoMatricula
-	    		iDatosBrutoAlumnoMatriculaRepository.delete(datosBrutoAlumnoMatriculaOpt.get());
+
 	    	}
 	        // Devolver mensaje de OK
 	        return ResponseEntity.status(200).body("INFO - Alumnos asignados correctamente con el curso" + cursoEtapaGrupo.getIdCursoEtapaGrupo().getCurso() + cursoEtapaGrupo.getIdCursoEtapaGrupo().getEtapa() + cursoEtapaGrupo.getIdCursoEtapaGrupo().getGrupo());
@@ -323,49 +329,54 @@ public class BaseController
 	@RequestMapping(method = RequestMethod.DELETE, value = "/grupos/alumnos")
 	public ResponseEntity<?> desasignarAlumno
 	(
-	        @RequestParam AlumnoDto alumno
+	        @RequestBody AlumnoDto alumno
 	) 
 	{
 	    try 
 	    {
 	    	// Optional DatosBrutoAlumnoMatriculaGrupo
-	    	Optional<DatosBrutoAlumnoMatriculaGrupoEntity> datosBrutoAlumnoMatriculaGrupoOpt= iDatosBrutoAlumnoMatriculaGrupoRepository.findByNombreAndApellidos(alumno.getNombre(), alumno.getApellidos());
+	    	List<Optional<DatosBrutoAlumnoMatriculaGrupo>> datosBrutoAlumnoMatriculaGrupoAsignaturasOpt = iDatosBrutoAlumnoMatriculaGrupoRepository.findAllByNombreAndApellidos(alumno.getNombre(), alumno.getApellidos());
 	    	
-	    	// Si no existe
-	    	if(!datosBrutoAlumnoMatriculaGrupoOpt.isPresent())
+	    	// Por cada asignatura del Alumno
+	    	for(Optional<DatosBrutoAlumnoMatriculaGrupo> datosBrutoAlumnoMatriculaGrupoAsignaturaOpt: datosBrutoAlumnoMatriculaGrupoAsignaturasOpt)
 	    	{
-    			// Mensaje de error
-    	        String msgError = "ERROR - No se encontro los datos del alumno";
-    	        
-    	        // Mostrar el error a través de un log
-    	        log.error(msgError); 
-    	        
-    	        // Lanzar excepcion con mensaje de error
-    	        throw new MatriculasHorariosServerException(msgError);
+	    		// Si no existe
+		    	if(!datosBrutoAlumnoMatriculaGrupoAsignaturaOpt.isPresent())
+		    	{
+	    			// Mensaje de error
+	    	        String msgError = "ERROR - No se encontro los datos del alumno";
+	    	        
+	    	        // Mostrar el error a través de un log
+	    	        log.error(msgError); 
+	    	        
+	    	        // Lanzar excepcion con mensaje de error
+	    	        throw new MatriculasHorariosServerException(msgError);
+		    	}
+		    	
+		    	// Crear registro DatosBrutoAlumnoMatricula 
+		    	DatosBrutoAlumnoMatricula datosBrutoAlumnoMatricula = new DatosBrutoAlumnoMatricula();
+		        
+	    		// Crear CursoEtapa del Alumno
+	    		CursoEtapa cursoEtapa = new CursoEtapa();
+	    		IdCursoEtapa idCursoEtapa =  new IdCursoEtapa();
+	    		idCursoEtapa.setCurso(datosBrutoAlumnoMatriculaGrupoAsignaturaOpt.get().getCursoEtapaGrupo().getIdCursoEtapaGrupo().getCurso());
+	    		idCursoEtapa.setEtapa(datosBrutoAlumnoMatriculaGrupoAsignaturaOpt.get().getCursoEtapaGrupo().getIdCursoEtapaGrupo().getEtapa());
+	    		cursoEtapa.setIdCursoEtapa(idCursoEtapa);
+	    		
+	    		// Asignar alumno a registro de DatosBrutoAlumnoMatriculaEntity
+	    		datosBrutoAlumnoMatricula.setNombre(datosBrutoAlumnoMatriculaGrupoAsignaturaOpt.get().getNombre());
+	    		datosBrutoAlumnoMatricula.setApellidos(datosBrutoAlumnoMatriculaGrupoAsignaturaOpt.get().getApellidos());
+	    		datosBrutoAlumnoMatricula.setAsignatura(datosBrutoAlumnoMatriculaGrupoAsignaturaOpt.get().getAsignatura());
+	    		datosBrutoAlumnoMatricula.setCursoEtapa(cursoEtapa);
+	    		
+	    		// Guardar el registro en la tabla DatosBrutoAlumnoMatricula
+	    		iDatosBrutoAlumnoMatriculaRepository.saveAndFlush(datosBrutoAlumnoMatricula);
+	    		
+	    		// Eliminar el registro en la tabla DatosBrutoAlumnoMatriculaGrupo
+	    		iDatosBrutoAlumnoMatriculaGrupoRepository.delete(datosBrutoAlumnoMatriculaGrupoAsignaturaOpt.get());
+	    		
 	    	}
 	    	
-	    	// Crear registro DatosBrutoAlumnoMatricula 
-	    	DatosBrutoAlumnoMatriculaEntity datosBrutoAlumnoMatricula = new DatosBrutoAlumnoMatriculaEntity();
-	        
-    		// Crear CursoEtapa del Alumno
-    		CursoEtapaEntity cursoEtapa = new CursoEtapaEntity();
-    		IdCursoEtapa idCursoEtapa =  new IdCursoEtapa();
-    		idCursoEtapa.setCurso(datosBrutoAlumnoMatriculaGrupoOpt.get().getCursoEtapaGrupo().getIdCursoEtapaGrupo().getCurso());
-    		idCursoEtapa.setEtapa(datosBrutoAlumnoMatriculaGrupoOpt.get().getCursoEtapaGrupo().getIdCursoEtapaGrupo().getEtapa());
-    		cursoEtapa.setIdCursoEtapa(idCursoEtapa);
-    		
-    		// Asignar alumno a registro de DatosBrutoAlumnoMatriculaEntity
-    		datosBrutoAlumnoMatricula.setNombre(datosBrutoAlumnoMatriculaGrupoOpt.get().getNombre());
-    		datosBrutoAlumnoMatricula.setApellidos(datosBrutoAlumnoMatriculaGrupoOpt.get().getApellidos());
-    		datosBrutoAlumnoMatricula.setAsignatura(datosBrutoAlumnoMatriculaGrupoOpt.get().getAsignatura());
-    		datosBrutoAlumnoMatricula.setCursoEtapa(cursoEtapa);
-    		
-    		// Guardar el registro en la tabla DatosBrutoAlumnoMatricula
-    		iDatosBrutoAlumnoMatriculaRepository.saveAndFlush(datosBrutoAlumnoMatricula);
-    		
-    		// Eliminar el registro en la tabla DatosBrutoAlumnoMatriculaGrupo
-    		iDatosBrutoAlumnoMatriculaGrupoRepository.delete(datosBrutoAlumnoMatriculaGrupoOpt.get());
-    		
 	    	// Devolver mensaje de OK
 	        return ResponseEntity.status(200).body("INFO - Alumno desasignado correctamente");
 	    } 

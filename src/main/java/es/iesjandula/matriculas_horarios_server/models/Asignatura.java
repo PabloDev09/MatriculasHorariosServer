@@ -18,23 +18,23 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Entity
 @Table(name = "Asignatura")
-public class AsignaturaEntity 
+public class Asignatura 
 {
 	@EmbeddedId
 	private IdAsignatura id;
 	
 	@ManyToOne
 	@JoinColumn(name="departamento_propietario", referencedColumnName = "nombre")
-	private DepartamentoEntity departamentoPropietario;
+	private Departamento departamentoPropietario;
 	
 	@ManyToOne
 	@JoinColumn(name="departamento_receptor", referencedColumnName = "nombre")
-	private DepartamentoEntity departamentoReceptor;
+	private Departamento departamentoReceptor;
 	
 	@ManyToOne
 	@JoinColumn(name="bloque_id", referencedColumnName="id")
-	private BloqueEntity bloqueId;
+	private Bloque bloqueId;
 	
 	@OneToMany(mappedBy = "asignatura")
-	private List<MatriculaEntity> matriculas;
+	private List<Matricula> matriculas;
 }	

@@ -16,11 +16,11 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Entity
 @Table(name = "Curso_Etapa_Grupo")
-public class CursoEtapaGrupoEntity 
+public class CursoEtapaGrupo 
 {
     @EmbeddedId
     private IdCursoEtapaGrupo idCursoEtapaGrupo;
 
     @OneToMany(mappedBy = "cursoEtapaGrupo")
-    private List<DatosBrutoAlumnoMatriculaGrupoEntity> datosBrutosAlumnosMatriculadosGrupo;
+    private List<DatosBrutoAlumnoMatriculaGrupo> datosBrutosAlumnosMatriculadosGrupo;
 }

@@ -2,8 +2,8 @@ package es.iesjandula.matriculas_horarios_server.models.ids;
 
 import java.io.Serializable;
 
-import es.iesjandula.matriculas_horarios_server.models.AlumnoEntity;
-import es.iesjandula.matriculas_horarios_server.models.AsignaturaEntity;
+import es.iesjandula.matriculas_horarios_server.models.Alumno;
+import es.iesjandula.matriculas_horarios_server.models.Asignatura;
 import jakarta.persistence.Embeddable;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinColumns;
@@ -23,11 +23,11 @@ public class IdMatricula implements Serializable {
         @JoinColumn(name = "asignatura_grupo", referencedColumnName = "grupo"),
         @JoinColumn(name = "asignatura_nombre", referencedColumnName = "nombre")
     })
-    private AsignaturaEntity asignatura;
+    private Asignatura asignatura;
 
     @ManyToOne
     @JoinColumn(name = "alumno_id", referencedColumnName = "id")
-    private AlumnoEntity alumno;
+    private Alumno alumno;
 
  
 }

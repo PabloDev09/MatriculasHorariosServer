@@ -12,7 +12,7 @@ import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "Matricula")
-public class MatriculaEntity {
+public class Matricula {
 
     @EmbeddedId
     private IdMatricula id;
@@ -25,6 +25,6 @@ public class MatriculaEntity {
         @JoinColumn(name = "asignatura_grupo", referencedColumnName = "grupo", insertable = false, updatable = false),
         @JoinColumn(name = "asignatura_nombre", referencedColumnName = "nombre", insertable = false, updatable = false)
     })
-    private AsignaturaEntity asignatura;
+    private Asignatura asignatura;
 
 }

@@ -18,7 +18,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Entity
 @Table(name = "Profesor")
-public class ProfesorEntity 
+public class Profesor 
 {
 	@Id
 	@Column(length = 100)
@@ -32,11 +32,11 @@ public class ProfesorEntity
 	
 	@ManyToOne
 	@JoinColumn(name = "departamento_nombre")
-	private DepartamentoEntity departamento;
+	private Departamento departamento;
 	
 	@OneToMany(mappedBy = "profesor")
-	private List<ImpartirEntity> impartires;
+	private List<Impartir> impartires;
 	
 	@OneToMany(mappedBy = "profesor")
-	private List<ProfesorReduccionEntity> profesorReducciones;
+	private List<ProfesorReduccion> profesorReducciones;
 }

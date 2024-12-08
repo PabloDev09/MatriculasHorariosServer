@@ -5,8 +5,8 @@ import java.util.Scanner;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import es.iesjandula.matriculas_horarios_server.models.CursoEtapaEntity;
-import es.iesjandula.matriculas_horarios_server.models.DatosBrutoAlumnoMatriculaEntity;
+import es.iesjandula.matriculas_horarios_server.models.CursoEtapa;
+import es.iesjandula.matriculas_horarios_server.models.DatosBrutoAlumnoMatricula;
 import es.iesjandula.matriculas_horarios_server.repositories.IDatosBrutoAlumnoMatriculaRepository;
 import es.iesjandula.matriculas_horarios_server.utils.Constants;
 import es.iesjandula.matriculas_horarios_server.utils.MatriculasHorariosServerException;
@@ -19,7 +19,7 @@ public class ParseoDatosBrutosImpl implements IParseoDatosBrutos
 	IDatosBrutoAlumnoMatriculaRepository iDatosBrutoAlumnoMatriculaRepository;
 	
 	@Override
-	public void parseoDatosBrutos(Scanner scanner, CursoEtapaEntity cursoEtapaEntity) throws MatriculasHorariosServerException 
+	public void parseoDatosBrutos(Scanner scanner, CursoEtapa cursoEtapa) throws MatriculasHorariosServerException 
 	{
 		// Linea de campos -> alumno, lengua, mates, ingles
 		String lineaCampos = scanner.nextLine();
@@ -44,13 +44,13 @@ public class ParseoDatosBrutosImpl implements IParseoDatosBrutos
 				String nombreAlumno = valoresRegistro[1].trim();
 				
 				// Crear registro
-				DatosBrutoAlumnoMatriculaEntity datosBrutoAlumnoMatriculaEntity = new DatosBrutoAlumnoMatriculaEntity();
+				DatosBrutoAlumnoMatricula datosBrutoAlumnoMatricula = new DatosBrutoAlumnoMatricula();
 				
 				// Añadir apellidos del alumno al registro -> Martinez Guerbos
-				datosBrutoAlumnoMatriculaEntity.setApellidos(apellidosAlumno);
+				datosBrutoAlumnoMatricula.setApellidos(apellidosAlumno);
 				
 				// Añadir nombre del alumno al registro -> Pablo
-				datosBrutoAlumnoMatriculaEntity.setNombre(nombreAlumno);
+				datosBrutoAlumnoMatricula.setNombre(nombreAlumno);
 				
 				for(int i = 1; i < valoresCampos.length; i++)
 				{
@@ -61,13 +61,13 @@ public class ParseoDatosBrutosImpl implements IParseoDatosBrutos
 						String asignatura = valoresCampos[i].trim();
 						
 						// Añadir asignatura matriculada al registro -> LENGUA
-						datosBrutoAlumnoMatriculaEntity.setAsignatura(asignatura.toUpperCase());
+						datosBrutoAlumnoMatricula.setAsignatura(asignatura.toUpperCase());
 						
 						// Añadir curso al registro -> 2DAM
-						datosBrutoAlumnoMatriculaEntity.setCursoEtapa(cursoEtapaEntity);
+						datosBrutoAlumnoMatricula.setCursoEtapa(cursoEtapa);
 						
 						// Guardar o actualizar en la tabla -> DatosBrutoAlumnoMatricula
-						iDatosBrutoAlumnoMatriculaRepository.saveAndFlush(datosBrutoAlumnoMatriculaEntity);
+						iDatosBrutoAlumnoMatriculaRepository.saveAndFlush(datosBrutoAlumnoMatricula);
 					}
 				}
 			}

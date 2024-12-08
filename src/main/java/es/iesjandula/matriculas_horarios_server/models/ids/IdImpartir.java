@@ -1,7 +1,7 @@
 package es.iesjandula.matriculas_horarios_server.models.ids;
 
-import es.iesjandula.matriculas_horarios_server.models.AsignaturaEntity;
-import es.iesjandula.matriculas_horarios_server.models.ProfesorEntity;
+import es.iesjandula.matriculas_horarios_server.models.Asignatura;
+import es.iesjandula.matriculas_horarios_server.models.Profesor;
 import jakarta.persistence.Embeddable;
 import jakarta.persistence.ManyToOne;
 import lombok.AllArgsConstructor;
@@ -15,8 +15,8 @@ import lombok.NoArgsConstructor;
 public class IdImpartir 
 {
 	@ManyToOne
-	private AsignaturaEntity asignatura;
+	private Asignatura asignatura;
 
 	@ManyToOne
-	private ProfesorEntity profesor;
+	private Profesor profesor;
 }

@@ -15,19 +15,14 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name = "Reduccion")
-public class ReduccionEntity 
+@Table(name = "Bloque")
+public class Bloque 
 {
 	@Id
 	@Column(length = 100)
-	private String nombre;
+	private String id;
 	
-	@Column(nullable = false)
-	private int horas;
+	@OneToMany(mappedBy = "bloqueId")
+	private List<Asignatura> asignaturas;
 	
-	@Column(nullable = true)
-	private boolean decideDireccion;
-	
-	@OneToMany(mappedBy = "reduccion")
-	private List<ProfesorReduccionEntity> profesorReducciones;
 }

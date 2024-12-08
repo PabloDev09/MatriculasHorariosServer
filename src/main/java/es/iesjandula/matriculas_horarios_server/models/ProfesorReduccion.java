@@ -1,7 +1,6 @@
 package es.iesjandula.matriculas_horarios_server.models;
 
-
-import es.iesjandula.matriculas_horarios_server.models.ids.IdImpartir;
+import es.iesjandula.matriculas_horarios_server.models.ids.IdProfesorReduccion;
 import jakarta.persistence.EmbeddedId;
 import jakarta.persistence.Entity;
 import jakarta.persistence.ManyToOne;
@@ -15,18 +14,18 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name = "Impartir")
-public class ImpartirEntity 
+@Table(name = "Profesor_Reduccion")
+public class ProfesorReduccion 
 {
 	@EmbeddedId
-	private IdImpartir idImpartir;
-	
-	@MapsId(value = "asignatura")
-	@ManyToOne
-	private AsignaturaEntity asignatura;
+	private IdProfesorReduccion idProfesorReduccion;
 	
 	@MapsId(value = "profesor")
 	@ManyToOne
-	private ProfesorEntity profesor;
+	private Profesor profesor;
 	
+	@MapsId(value = "reduccion")
+	@ManyToOne
+	private Reduccion reduccion;
+
 }

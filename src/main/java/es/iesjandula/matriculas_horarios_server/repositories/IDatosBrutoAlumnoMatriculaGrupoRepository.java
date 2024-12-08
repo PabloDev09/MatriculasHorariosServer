@@ -6,14 +6,14 @@ import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import es.iesjandula.matriculas_horarios_server.models.CursoEtapaGrupoEntity;
-import es.iesjandula.matriculas_horarios_server.models.DatosBrutoAlumnoMatriculaGrupoEntity;
+import es.iesjandula.matriculas_horarios_server.models.CursoEtapaGrupo;
+import es.iesjandula.matriculas_horarios_server.models.DatosBrutoAlumnoMatriculaGrupo;
 
 @Repository
-public interface IDatosBrutoAlumnoMatriculaGrupoRepository extends JpaRepository<DatosBrutoAlumnoMatriculaGrupoEntity, Integer>
+public interface IDatosBrutoAlumnoMatriculaGrupoRepository extends JpaRepository<DatosBrutoAlumnoMatriculaGrupo, Integer>
 {
 
-	public List<DatosBrutoAlumnoMatriculaGrupoEntity> findAllByCursoEtapaGrupo(CursoEtapaGrupoEntity cursoEtapaGrupo);
+	public List<DatosBrutoAlumnoMatriculaGrupo> findAllByCursoEtapaGrupo(CursoEtapaGrupo cursoEtapaGrupo);
 
-	public Optional<DatosBrutoAlumnoMatriculaGrupoEntity> findByNombreAndApellidos(String nombre, String apellidos);
+	public List<Optional<DatosBrutoAlumnoMatriculaGrupo>> findAllByNombreAndApellidos(String nombre, String apellidos);
 }
