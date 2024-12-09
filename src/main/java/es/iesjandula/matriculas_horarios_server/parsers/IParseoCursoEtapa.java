@@ -1,4 +1,4 @@
-package es.iesjandula.matriculas_horarios_server.services;
+package es.iesjandula.matriculas_horarios_server.parsers;
 
 import java.util.Scanner;
 

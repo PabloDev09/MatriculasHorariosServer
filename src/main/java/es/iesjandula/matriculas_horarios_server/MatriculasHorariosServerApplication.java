@@ -9,8 +9,8 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.transaction.annotation.Transactional;
 
-import es.iesjandula.matriculas_horarios_server.services.IParseoCursoEtapa;
-import es.iesjandula.matriculas_horarios_server.services.IParseoDatosBrutos;
+import es.iesjandula.matriculas_horarios_server.parsers.IParseoCursoEtapa;
+import es.iesjandula.matriculas_horarios_server.parsers.IParseoDatosBrutos;
 import es.iesjandula.matriculas_horarios_server.utils.Constants;
 
 /**
