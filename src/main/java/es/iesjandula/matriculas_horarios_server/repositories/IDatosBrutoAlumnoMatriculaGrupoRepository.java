@@ -4,8 +4,11 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import es.iesjandula.matriculas_horarios_server.dtos.AlumnoDto;
 import es.iesjandula.matriculas_horarios_server.models.CursoEtapaGrupo;
 import es.iesjandula.matriculas_horarios_server.models.DatosBrutoAlumnoMatriculaGrupo;
 
@@ -36,4 +39,25 @@ public interface IDatosBrutoAlumnoMatriculaGrupoRepository extends JpaRepository
      * @return List<Optional<DatosBrutoAlumnoMatriculaGrupo>> - Una lista de {@link Optional} de {@link DatosBrutoAlumnoMatriculaGrupo} que coinciden con el nombre y apellidos.
      */
     public List<Optional<DatosBrutoAlumnoMatriculaGrupo>> findAllByNombreAndApellidos(String nombre, String apellidos);
+
+    /**
+     * Método para obtener nombres y apellidos únicos y mapearlos al DTO AlumnoDto.
+     *
+     * @param curso  		   - El curso específico.
+     * @param etapa 		   - La etapa específica.
+     * @param grupo 		   - El grupo específico.
+     * @return List<AlumnoDto> - La lista de AlumnoDto con nombres y apellidos únicos.
+     */
+    @Query("SELECT new es.iesjandula.matriculas_horarios_server.dtos.AlumnoDto(d.nombre, d.apellidos) " +
+           "FROM DatosBrutoAlumnoMatriculaGrupo d " +
+           "WHERE d.cursoEtapaGrupo.idCursoEtapaGrupo.curso = :curso " +
+           "AND d.cursoEtapaGrupo.idCursoEtapaGrupo.etapa = :etapa " +
+           "AND d.cursoEtapaGrupo.idCursoEtapaGrupo.grupo = :grupo " +
+           "GROUP BY d.nombre, d.apellidos")
+    List<AlumnoDto> findDistinctAlumnosByCursoEtapaGrupo
+    (
+            @Param("curso") Integer curso, 
+            @Param("etapa") String etapa,
+            @Param("grupo") Character grupo
+    );
 }
