@@ -1,6 +1,5 @@
 package es.iesjandula.matriculas_horarios_server.rest;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -8,13 +7,12 @@ import java.util.Optional;
 import java.util.Scanner;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -35,10 +33,17 @@ import es.iesjandula.matriculas_horarios_server.utils.Constants;
 import es.iesjandula.matriculas_horarios_server.utils.MatriculasHorariosServerException;
 import lombok.extern.slf4j.Slf4j;
 
+/**
+ * Clase controlador - DireccionController 
+ * --------------------------------------------------------------------------- 
+ * REST para gestionar la dirección de cursos, grupos y asignación de alumnos.
+ * ---------------------------------------------------------------------------
+ */
+
 @Slf4j
 @RestController
-@RequestMapping(value = "/base")
-public class BaseController 
+@RequestMapping(value = "/direccion")
+public class DireccionController 
 {	
 	@Autowired
 	ICursoEtapaRepository iCursoEtapaRepository;
@@ -58,27 +63,46 @@ public class BaseController
     @Autowired
     AlumnoService alumnoService;
 	
-	
-	@RequestMapping(method = RequestMethod.POST, value = "/cargarMatriculas", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    /**
+     * Carga las matrículas de los alumnos a partir de un archivo CSV.
+     *
+     * @param curso       - Año del curso al que pertenece la matrícula (requerido en el encabezado).
+     * @param etapa       		- Etapa educativa (requerido en el encabezado).
+     * @param archivoCsv  		- Archivo CSV con las matrículas (requerido como parámetro).
+     * @return ResponseEntity 	-  HTTP indicando si el proceso fue exitoso.
+     */
+	@RequestMapping(method = RequestMethod.POST, value = "/cargarMatriculas", consumes = "multipart/form-data")
 	public ResponseEntity<?> cargarMatriculas 
 	(
-			@RequestPart("cursoEtapa") CursoEtapa cursoEtapa,
-			@RequestParam("archivo") MultipartFile archivo
+			@RequestHeader(value = "curso", required = true) Integer curso,
+			@RequestHeader(value = "etapa", required = true) String etapa,
+			@RequestParam(value = "archivoCsv", required = true) MultipartFile archivoCsv
 	)
 	{
 		try 
 		{
 			// Si el archivo esta vacio
-			if(archivo.isEmpty())
+			if(archivoCsv.isEmpty())
 			{
 				throw new MatriculasHorariosServerException(400, "ERROR - El archivo importado está vacio");
 			}
 			
-	        // Convertir MultipartFile a Readable 
-	        ByteArrayInputStream archivoReadable = new ByteArrayInputStream(archivo.getBytes());
+	        // Convertir MultipartFile a String
+	        String archivoCsvReadable = new String(archivoCsv.getBytes());
 			    
 	        // Declarar Scanner para realizar lectura del fichero
-			Scanner scanner = new Scanner(archivoReadable);
+			Scanner scanner = new Scanner(archivoCsvReadable);
+			
+			// Registro cursoEtapa
+			CursoEtapa cursoEtapa = new CursoEtapa();
+			IdCursoEtapa idCursoEtapa = new IdCursoEtapa();
+			
+			// Asignar los campos al id de cursoEtapa
+			idCursoEtapa.setCurso(curso);
+			idCursoEtapa.setEtapa(etapa);
+			
+			// Asignar id al registro cursoEtapa
+			cursoEtapa.setIdCursoEtapa(idCursoEtapa);
 			
 			// Llamar al Service IParseoDatosBrutos para realizar parseo
 			this.iParseoDatosBrutos.parseoDatosBrutos(scanner, cursoEtapa);
@@ -140,6 +164,11 @@ public class BaseController
 		}
 	}
 	
+    /**
+     * Obtiene una lista de todos los cursos y etapas.
+     *
+     * @return Lista<CursoEtapa> o ResponseEntity con mensaje de error.
+     */
 	@RequestMapping(method = RequestMethod.POST, value = "/grupos")
 	public ResponseEntity<?> crearGrupo
 	(
@@ -393,21 +422,13 @@ public class BaseController
 	    }
 	}
 	
-	
-	
-
-
-
-
-	    @RequestMapping()
+	    @RequestMapping(method = RequestMethod.GET, value = "/grupos/alumnos")
 	    public List<AlumnoDto> obtenerAlumnos
 	    (
-	    		@RequestParam String curso, 
-	            @RequestParam String etapa, 
-	            @RequestParam String grupo
+	    		@RequestParam(value="curso", required = true) String curso, 
+	            @RequestParam(value="etapa", required = true) String etapa, 
+	            @RequestParam(value="grupo", required = true) String grupo
 	                                     
-	    		
-	    		
 	    ) 
 	    {
 	        return alumnoService.obtenerAlumnosPorCursoEtapaGrupo(curso, etapa, grupo);
