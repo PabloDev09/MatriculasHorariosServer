@@ -83,7 +83,7 @@ public class ParseoDatosBrutosImpl implements IParseoDatosBrutos
                             datosBrutoAlumnoMatricula.setCursoEtapa(cursoEtapa);
                             
                             // Guardar o actualizar en la tabla -> DatosBrutoAlumnoMatricula
-                            iDatosBrutoAlumnoMatriculaRepository.saveAndFlush(datosBrutoAlumnoMatricula);
+                            this.iDatosBrutoAlumnoMatriculaRepository.saveAndFlush(datosBrutoAlumnoMatricula);
                         }
                     }
                 }

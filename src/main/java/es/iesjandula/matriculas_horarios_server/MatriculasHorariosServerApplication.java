@@ -61,6 +61,6 @@ public class MatriculasHorariosServerApplication implements CommandLineRunner
 		Scanner scanner = new Scanner(file);
 
 		// Llamar al servicio para parsear el archivo de cursos y etapas.
-		iParseoCursoEtapa.parseoCursoEtapa(scanner);
+		this.iParseoCursoEtapa.parseoCursoEtapa(scanner);
 	}
 }
